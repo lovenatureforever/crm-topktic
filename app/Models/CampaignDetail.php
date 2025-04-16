@@ -19,6 +19,6 @@ class CampaignDetail extends Model
 
     public function agent(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'assigned_agent');
+        return $this->belongsTo(User::class, 'assigned_user');
     }
 }

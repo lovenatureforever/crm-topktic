@@ -237,7 +237,7 @@ class CampaignController extends Controller
             if (!isset($applicantidentity))
                 $applicantidentity = '';
 
-            $builder = CampaignDetail::with(['leader', 'agent'])->where('applicantname',  'LIKE', "%{$applicantname}%")
+            $builder = CampaignDetail::with(['leader', 'agent'])->where('applicantname', 'LIKE', "%{$applicantname}%")
                 ->where('applicantidentity', 'LIKE', "%{$applicantidentity}%");
 
             if (isset($start_date) && isset($end_date)) {
@@ -339,33 +339,32 @@ class CampaignController extends Controller
     public function getUnassignedCountWithFilter(Request $request, $id)
     {
         $user = $request->user();
-
+        $all_builder = $this->getFilter($request);
+        $unassigned_builder = $this->getFilter($request);
         if ($user->role == UserRole::ADMIN) {
-            $all_builder = CampaignDetail::where('campaign_id', $id);
-            $unassigned_builder = CampaignDetail::where('campaign_id', $id)->whereNull('assigned_leader');
+            $all_builder = $all_builder->where('campaign_id', $id);
+            $unassigned_builder = $unassigned_builder->where('campaign_id', $id)->whereNull('assigned_leader');
         } else {
             $where = [
                 'campaign_id' => $id,
                 'assigned_leader' => $user->id
             ];
-            $all_builder = CampaignDetail::where($where);
-            $unassigned_builder = CampaignDetail::where($where)->whereNull('assigned_user');
+            $all_builder = $all_builder->where($where);
+            $unassigned_builder = $unassigned_builder->where($where)->whereNull('assigned_user');
         }
 
-        $where = $this->getFilter($request);
-
         if ($request->category == -2) {
-            $all = $all_builder->where($where)->where(function ($query) {
+            $all = $all_builder->where(function ($query) {
                 $query->whereNull('progressStatus')
                     ->orWhere('progressStatus', '');
             })->count();
-            $unassigned = $unassigned_builder->where($where)->where(function ($query) {
+            $unassigned = $unassigned_builder->where(function ($query) {
                 $query->whereNull('progressStatus')
                     ->orWhere('progressStatus', '');
             })->count();
         } else {
-            $all = $all_builder->where($where)->count();
-            $unassigned = $unassigned_builder->where($where)->count();
+            $all = $all_builder->count();
+            $unassigned = $unassigned_builder->count();
         }
 
         return response()->json([
@@ -374,122 +373,123 @@ class CampaignController extends Controller
             "unassigned_count" => $unassigned
         ]);
     }
-
     public function getFilter(Request $request)
     {
-        $where = [];
-        if (isset($request->applicanttypename) && $request->applicanttypename != '') {
-            $where["applicanttypename"] = $request->applicanttypename;
+        $query = CampaignDetail::query();
+
+        if ($request->filled('applicanttypename')) {
+            $query->where('applicanttypename', 'like', '%' . trim($request->applicanttypename) . '%');
         }
-        if (isset($request->applicantidentity) && $request->applicantidentity != '') {
-            $where["applicantidentity"] = $request->applicantidentity;
+        if ($request->filled('applicantidentity')) {
+            $query->where('applicantidentity', 'like', trim($request->applicantidentity) . '%');
         }
-        if (isset($request->applicantcompany) && $request->applicantcompany != '') {
-            $where["applicantcompany"] = $request->applicantcompany;
+        if ($request->filled('applicantcompany')) {
+            $query->where('applicantcompany', 'like', '%' . trim($request->applicantcompany) . '%');
         }
-        if (isset($request->applicantbusinessregistrationnumber) && $request->applicantbusinessregistrationnumber != '') {
-            $where["applicantbusinessregistrationnumber"] = $request->applicantbusinessregistrationnumber;
+        if ($request->filled('applicantbusinessregistrationnumber')) {
+            $query->where('applicantbusinessregistrationnumber', 'like', '%' . trim($request->applicantbusinessregistrationnumber) . '%');
         }
-        if (isset($request->applicantname) && $request->applicantname != '') {
-            $where["applicantname"] = $request->applicantname;
+        if ($request->filled('applicantname')) {
+            $query->where('applicantname', 'like', '%' . trim($request->applicantname) . '%');
         }
-        if (isset($request->racename) && $request->racename != 'All') {
-            $where["racename"] = $request->racename;
+        if ($request->filled('racename') && $request->racename != 'All') {
+            $query->where('racename', '=', trim($request->racename));
         }
-        if (isset($request->applicantmobile) && $request->applicantmobile != '') {
-            $where["applicantmobile"] = $request->applicantmobile;
+        if ($request->filled('applicantmobile')) {
+            $query->where('applicantmobile', 'like', '%' . trim($request->applicantmobile) . '%');
         }
-        if (isset($request->applicantfax) && $request->applicantfax != '') {
-            $where["applicantfax"] = $request->applicantfax;
+        if ($request->filled('applicantfax')) {
+            $query->where('applicantfax', 'like', '%' . trim($request->applicantfax) . '%');
         }
-        if (isset($request->applicantaddress1) && $request->applicantaddress1 != '') {
-            $where["applicantaddress1"] = $request->applicantaddress1;
+        if ($request->filled('applicantaddress1')) {
+            $query->where('applicantaddress1', 'like', '%' . trim($request->applicantaddress1) . '%');
         }
-        if (isset($request->applicantaddress2) && $request->applicantaddress2 != '') {
-            $where["applicantaddress2"] = $request->applicantaddress2;
+        if ($request->filled('applicantaddress2')) {
+            $query->where('applicantaddress2', 'like', '%' . trim($request->applicantaddress2) . '%');
         }
-        if (isset($request->applicantaddress3) && $request->applicantaddress3 != '') {
-            $where["applicantaddress3"] = $request->applicantaddress3;
+        if ($request->filled('applicantaddress3')) {
+            $query->where('applicantaddress3', 'like', '%' . trim($request->applicantaddress3) . '%');
         }
-        if (isset($request->applicantpostcode) && $request->applicantpostcode != '') {
-            $where["applicantpostcode"] = $request->applicantpostcode;
+        if ($request->filled('applicantpostcode')) {
+            $query->where('applicantpostcode', 'like', '%' . trim($request->applicantpostcode) . '%');
         }
-        if (isset($request->applicantcity) && $request->applicantcity != '') {
-            $where["applicantcity"] = $request->applicantcity;
+        if ($request->filled('applicantcity')) {
+            $query->where('applicantcity', 'like', trim($request->applicantcity) . '%');
         }
-        if (isset($request->applicantstate) && $request->applicantstate != '') {
-            $where["applicantstate"] = $request->applicantstate;
+        if ($request->filled('applicantstate')) {
+            $query->where('applicantstate', 'like', trim($request->applicantstate) . '%');
         }
-        if (isset($request->applicantemail) && $request->applicantemail != '') {
-            $where["applicantemail"] = $request->applicantemail;
+        if ($request->filled('applicantemail')) {
+            $query->where('applicantemail', 'like', '%' . trim($request->applicantemail) . '%');
         }
-        if (isset($request->installationaddress1) && $request->installationaddress1 != '') {
-            $where["installationaddress1"] = $request->installationaddress1;
+        if ($request->filled('installationaddress1')) {
+            $query->where('installationaddress1', 'like', '%' . $request->installationaddress1 . '%');
         }
-        if (isset($request->installationaddress2) && $request->installationaddress2 != '') {
-            $where["installationaddress2"] = $request->installationaddress2;
+        if ($request->filled('installationaddress2')) {
+            $query->where('installationaddress2', 'like', '%' . $request->installationaddress2 . '%');
         }
-        if (isset($request->installationaddress3) && $request->installationaddress3 != '') {
-            $where["installationaddress3"] = $request->installationaddress3;
+        if ($request->filled('installationaddress3')) {
+            $query->where('installationaddress3', 'like', '%' . $request->installationaddress3 . '%');
         }
-        if (isset($request->installationpostcode) && $request->installationpostcode != '') {
-            $where["installationpostcode"] = $request->installationpostcode;
+        if ($request->filled('installationpostcode')) {
+            $query->where('installationpostcode', 'like', '%' . $request->installationpostcode . '%');
         }
-        if (isset($request->installationcity) && $request->installationcity != '') {
-            $where["installationcity"] = $request->installationcity;
+        if ($request->filled('installationcity')) {
+            $query->where('installationcity', 'like', '%' . $request->installationcity . '%');
         }
-        if (isset($request->installationstate) && $request->installationstate != '') {
-            $where["installationstate"] = $request->installationstate;
+        if ($request->filled('installationstate')) {
+            $query->where('installationstate', 'like', '%' . $request->installationstate . '%');
         }
-        if (isset($request->installationpropertytype) && $request->installationpropertytype != '') {
-            $where["installationpropertytype"] = $request->installationpropertytype;
+        if ($request->filled('installationpropertytype')) {
+            $query->where('installationpropertytype', 'like', '%' . $request->installationpropertytype . '%');
         }
-        if (isset($request->installationcontactperson) && $request->installationcontactperson != '') {
-            $where["installationcontactperson"] = $request->installationcontactperson;
+        if ($request->filled('installationcontactperson')) {
+            $query->where('installationcontactperson', 'like', '%' . $request->installationcontactperson . '%');
         }
-        if (isset($request->installationcontactnumber) && $request->installationcontactnumber != '') {
-            $where["installationcontactnumber"] = $request->installationcontactnumber;
+        if ($request->filled('installationcontactnumber')) {
+            $query->where('installationcontactnumber', 'like', '%' . $request->installationcontactnumber . '%');
         }
-        if (isset($request->billingaddress1) && $request->billingaddress1 != '') {
-            $where["billingaddress1"] = $request->billingaddress1;
+        if ($request->filled('billingaddress1')) {
+            $query->where('billingaddress1', 'like', '%' . $request->billingaddress1 . '%');
         }
-        if (isset($request->billingaddress2) && $request->billingaddress2 != '') {
-            $where["billingaddress2"] = $request->billingaddress2;
+        if ($request->filled('billingaddress2')) {
+            $query->where('billingaddress2', 'like', '%' . $request->billingaddress2 . '%');
         }
-        if (isset($request->billingaddress3) && $request->billingaddress3 != '') {
-            $where["billingaddress3"] = $request->billingaddress3;
+        if ($request->filled('billingaddress3')) {
+            $query->where('billingaddress3', 'like', '%' . $request->billingaddress3 . '%');
         }
-        if (isset($request->billingpostcode) && $request->billingpostcode != '') {
-            $where["billingpostcode"] = $request->billingpostcode;
+        if ($request->filled('billingpostcode')) {
+            $query->where('billingpostcode', 'like', '%' . $request->billingpostcode . '%');
         }
-        if (isset($request->billingcity) && $request->billingcity != '') {
-            $where["billingcity"] = $request->billingcity;
+        if ($request->filled('billingcity')) {
+            $query->where('billingcity', 'like', '%' . $request->billingcity . '%');
         }
-        if (isset($request->billingstate) && $request->billingstate != '') {
-            $where["billingstate"] = $request->billingstate;
+        if ($request->filled('billingstate')) {
+            $query->where('billingstate', 'like', '%' . $request->billingstate . '%');
         }
-        if (isset($request->productgroup) && $request->productgroup != '') {
-            $where["productgroup"] = $request->productgroup;
+        if ($request->filled('productgroup')) {
+            $query->where('productgroup', 'like', '%' . $request->productgroup . '%');
         }
-        if (isset($request->productname) && $request->productname != '') {
-            $where["productname"] = $request->productname;
+        if ($request->filled('productname')) {
+            $query->where('productname', 'like', '%' . trim($request->productname) . '%');
         }
 
-        if (isset($request->category) && $request->category != -1 && $request->category != -2) {
+        // For category and sub-category
+        if ($request->filled('category') && $request->category != -1 && $request->category != -2) {
             $category = Category::find($request->category);
             if ($category != null) {
-                $where["progressStatus"] = $category->name;
+                $query->where('progressStatus', '=', $category->name);
             }
 
-            if (isset($request->sub_category) && $request->sub_category != -1) {
-                $category = Category::find($request->sub_category);
-                if ($category != null) {
-                    $where["progressSubStatus"] = $category->name;
+            if ($request->filled('sub_category') && $request->sub_category != -1) {
+                $subCategory = Category::find($request->sub_category);
+                if ($subCategory != null) {
+                    $query->where('progressSubStatus', '=', $subCategory->name);
                 }
             }
         }
 
-        return $where;
+        return $query;
     }
 
     public function assign(Request $request, $id)
@@ -572,9 +572,9 @@ class CampaignController extends Controller
         if ($request->method == 'Normal') {
             if ($request->category == -2) {
                 if ($isAdmin)
-                    CampaignDetail::where(['campaign_id' => $id])
+                    $whereFilter->where(['campaign_id' => $id])
                         ->whereNull('assigned_leader')
-                        ->where($whereFilter)
+                        // ->where($whereFilter)
                         ->where(function ($query) {
                             $query->whereNull('progressStatus')
                                 ->orWhere('progressStatus', '');
@@ -585,9 +585,9 @@ class CampaignController extends Controller
                             'assigned_leader' => $request->leader
                         ]);
                 else
-                    CampaignDetail::where($where)
+                    $whereFilter->where($where)
                         ->whereNull('assigned_user')
-                        ->where($whereFilter)
+                        // ->where($whereFilter)
                         ->where(function ($query) {
                             $query->whereNull('progressStatus')
                                 ->orWhere('progressStatus', '');
@@ -600,17 +600,17 @@ class CampaignController extends Controller
             } else {
 
                 if ($isAdmin)
-                    CampaignDetail::where(['campaign_id' => $id])
+                    $whereFilter->where(['campaign_id' => $id])
                         ->whereNull('assigned_leader')
-                        ->where($whereFilter)
+                        // ->where($whereFilter)
                         ->limit($request->amount)
                         ->update([
                             'assigned_leader' => $request->leader
                         ]);
                 else
-                    CampaignDetail::where($where)
+                    $whereFilter->where($where)
                         ->whereNull('assigned_user')
-                        ->where($whereFilter)
+                        // ->where($whereFilter)
                         ->limit($request->amount)
                         ->update([
                             'assigned_date' => date('Y-m-d'),
@@ -620,9 +620,9 @@ class CampaignController extends Controller
         } else {
             if ($request->category == -2) {
                 if ($isAdmin)
-                    CampaignDetail::where(['campaign_id' => $id])
+                    $whereFilter->where(['campaign_id' => $id])
                         ->whereNull('assigned_leader')
-                        ->where($whereFilter)
+                        // ->where($whereFilter)
                         ->where(function ($query) {
                             $query->whereNull('progressStatus')
                                 ->orWhere('progressStatus', '');
@@ -634,9 +634,9 @@ class CampaignController extends Controller
                             'assigned_leader' => $request->leader
                         ]);
                 else
-                    CampaignDetail::where($where)
+                    $whereFilter->where($where)
                         ->whereNull('assigned_user')
-                        ->where($whereFilter)
+                        // ->where($whereFilter)
                         ->where(function ($query) {
                             $query->whereNull('progressStatus')
                                 ->orWhere('progressStatus', '');
@@ -649,9 +649,9 @@ class CampaignController extends Controller
                         ]);
             } else {
                 if ($isAdmin)
-                    CampaignDetail::where(['campaign_id' => $id])
+                    $whereFilter->where(['campaign_id' => $id])
                         ->whereNull('assigned_leader')
-                        ->where($whereFilter)
+                        // ->where($whereFilter)
                         ->inRandomOrder()
                         ->limit($request->amount)
                         ->update([
@@ -659,9 +659,9 @@ class CampaignController extends Controller
                             'assigned_leader' => $request->leader
                         ]);
                 else
-                    CampaignDetail::where($where)
+                    $whereFilter->where($where)
                         ->whereNull('assigned_user')
-                        ->where($whereFilter)
+                        // ->where($whereFilter)
                         ->limit($request->amount)
                         ->inRandomOrder()
                         ->update([
@@ -853,13 +853,15 @@ class CampaignController extends Controller
     {
         $user = $request->user();
         $builder = CampaignDetail::where("campaign_id", $id)
-            ->whereDate('currentstatusdate', date('Y-m-d'))
+            // ->whereDate('currentstatusdate', date('Y-m-d'))
+            // ->where('currentstatusdate', '>=', date('Y-m-d') . ' 00:00:00')
+            ->whereRaw('DATE(currentstatusdate) = CURDATE() ')
             ->where('progressStatus', '!=', '');
 
         if ($user->role == UserRole::TEAM_LEADER) {
             $builder = $builder->where(['assigned_leader' => $user->id]);
         } else if ($user->role == UserRole::AGENT) {
-            $builder = $builder->where(['assigned_agent' => $user->id]);
+            $builder = $builder->where(['assigned_user' => $user->id]);
         }
 
         $total = $builder->count();

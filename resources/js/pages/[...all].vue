@@ -9,31 +9,17 @@ const authThemeMask = useGenerateImageVariant(miscMaskLight, miscMaskDark)
 
 <template>
   <div class="misc-wrapper">
-    <ErrorHeader
-      error-title="Page Not Found :("
-      error-description="We couldn't find the page you are looking for."
-    />
-    <VBtn
-      to="/"
-      class="mb-12"
-    >
+    <ErrorHeader error-title="Page Not Found :(" error-description="We couldn't find the page you are looking for." />
+    <VBtn to="/" class="mb-12">
       Back to Home
     </VBtn>
 
     <!-- 👉 Image -->
     <div class="misc-avatar w-100 text-center">
-      <VImg
-        :src="misc404"
-        alt="Coming Soon"
-        :max-width="200"
-        class="mx-auto"
-      />
+      <VImg :src="misc404" alt="Coming Soon" :max-width="200" class="mx-auto" />
     </div>
 
-    <VImg
-      :src="authThemeMask"
-      class="misc-footer-img d-none d-md-block"
-    />
+    <VImg :src="authThemeMask" class="misc-footer-img d-none d-md-block" />
   </div>
 </template>
 

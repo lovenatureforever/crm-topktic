@@ -1,62 +1,62 @@
+<!-- eslint-disable vue/prop-name-casing -->
 <script setup>
-import axios from '@axios';
-import CustomFilter from './CustomFilter.vue';
-import FilterTabs from './FilterTabs.vue';
-import FilteredList from './FilteredList.vue';
+import axios from "@axios"
+import CustomFilter from "./CustomFilter.vue"
+import FilterTabs from "./FilterTabs.vue"
+import FilteredList from "./FilteredList.vue"
 
 const props = defineProps({
   campaign_id: {
     type: Number,
-    required: true
+    required: true,
   },
 })
 
 const filterList = ref({})
-const status = ref("Default")
-const sub_status = ref("")
+const status = ref(localStorage.getItem('status')??"Default")
+const sub_status = ref(localStorage.getItem('sub_status')??"")
 const isNavDrawerOpen = ref(false)
 const isCustom = ref(false)
 const filter_param = ref({})
 
-const getCampaignDetailList = (param) => {
-
-  axios.get(`/admin/campaigns/${props.campaign_id}/filters`, {
-    status: status.value,
-    sub_status: sub_status.value,
-    ...param 
-  })
+const getCampaignDetailList = param => {
+  axios
+    .get(`/admin/campaigns/${props.campaign_id}/filters`, {
+      status: status.value,
+      sub_status: sub_status.value,
+      ...param,
+    })
     .then(res => {
       const _filterdList = []
       const { counts_status, counts_substatus } = res.data
-
-      let default_count, submission_count;
+      let default_count, submission_count
 
       for (var status of counts_status) {
-        const key = status.progressStatus == '' ? 'Default' : status.progressStatus
+        const key = status.progressStatus == "" ? "Default" : status.progressStatus
 
         const items = {
-          'All': status.count
+          All: status.count,
         }
-        if (key == 'Default') {
 
+        if (key == "Default") {
           if (status.count != 0) {
-            default_count = {key, items}
+            default_count = { key, items }
           }
-            
-        } else if (key == 'submission') {
-          
+        } else if (key == "submission") {
           if (status.count != 0) {
-            submission_count = {key, items}
-          }            
-        
+            submission_count = { key, items }
+          }
         } else {
-          counts_substatus.filter(substatus => substatus.progressStatus == status.progressStatus)
+          counts_substatus
+            .filter(
+              substatus => substatus.progressStatus == status.progressStatus,
+            )
             .forEach(substatus => {
               items[substatus.progressSubStatus] = substatus.count
-            });
+            })
 
-          _filterdList.push({key, items})
-        } 
+          _filterdList.push({ key, items })
+        }
       }
 
       if (default_count) {
@@ -71,12 +71,14 @@ const getCampaignDetailList = (param) => {
     })
 }
 
-const setFilter = (filter) => {
+const setFilter = filter => {
   if (status.value != filter.status || sub_status.value != filter.sub_status) {
     status.value = filter.status
-    sub_status.value = filter.sub_status    
+    sub_status.value = filter.sub_status
     isCustom.value = false
-  }  
+    localStorage.setItem('status', status.value)
+    localStorage.setItem('sub_status', sub_status.value)
+  }
 }
 
 const openFilterNavigation = () => {
@@ -87,11 +89,11 @@ const closeFilterNavigation = () => {
   isNavDrawerOpen.value = false
 }
 
-const applyCustomFilter = (param) => {
+const applyCustomFilter = param => {
   if (
-    param.applicantname.length == 0 && 
+    param.applicantname.length == 0 &&
     param.applicantidentity.length == 0 &&
-    (!param.start_date || param.start_date.length == 0) &&   
+    (!param.start_date || param.start_date.length == 0) &&
     (!param.end_date || param.end_date.length == 0)
   ) {
     isCustom.value = false
@@ -100,36 +102,38 @@ const applyCustomFilter = (param) => {
     isCustom.value = true
     filter_param.value = param
   }
-    
 }
 
 onMounted(() => {
   getCampaignDetailList()
 })
-
 </script>
+
 <template>
-    <div>
-        <FilterTabs 
-          v-if="Object.keys(filterList).length > 0" 
-          :filterList="filterList"
-          :status = "status"
-          :sub_status="sub_status"
-          :is_custom="isCustom"
-          @set-custom-filter="openFilterNavigation"
-          @set-filter="setFilter" />
+  <div>
+    <FilterTabs
+      v-if="Object.keys(filterList).length > 0"
+      :filter-list="filterList"
+      :status="status"
+      :sub_status="sub_status"
+      :is_custom="isCustom"
+      @set-custom-filter="openFilterNavigation"
+      @set-filter="setFilter"
+    />
 
-        <FilteredList 
-          class="mt-2" 
-          :campaign_id="props.campaign_id"
-          :status = "status"
-          :sub_status="sub_status"
-          :is_custom="isCustom"
-          :custom_filter="filter_param" />
+    <FilteredList
+      class="mt-2"
+      :campaign_id="props.campaign_id"
+      :status="status"
+      :sub_status="sub_status"
+      :is_custom="isCustom"
+      :custom_filter="filter_param"
+    />
 
-        <CustomFilter 
-          :isNavDrawerOpen="isNavDrawerOpen"
-          @close-custom-filter="closeFilterNavigation"
-          @apply-custom-filter="applyCustomFilter" />
-    </div>
+    <CustomFilter
+      :is-nav-drawer-open="isNavDrawerOpen"
+      @close-custom-filter="closeFilterNavigation"
+      @apply-custom-filter="applyCustomFilter"
+    />
+  </div>
 </template>

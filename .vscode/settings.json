@@ -90,5 +90,9 @@
         "borderStyle": "solid"
       }
     ]
-  }
+  },
+  "i18n-ally.localesPaths": [
+    "resources/js/plugins/i18n",
+    "resources/js/plugins/i18n/locales"
+  ]
 }

@@ -1,8 +1,8 @@
-import { isAdmin, isAdminOrTeamLeader } from "@/plugins/auth";
+import { isAdmin, isAdminOrTeamLeader } from "@/plugins/auth"
 
 const permissionedRoutes = () => {
-  const admin = isAdmin();
-  const isNotAgent = isAdminOrTeamLeader();
+  const admin = isAdmin()
+  const isNotAgent = isAdminOrTeamLeader()
   
   const defaultRoutes = [
     {
@@ -16,30 +16,37 @@ const permissionedRoutes = () => {
     title: 'Users',
     to: { name: 'users' },
     icon: { icon: 'tabler-user' },
-  };
+  }
   
-  let routesByRole = [];
+  let routesByRole = []
   
   if (admin)
-    routesByRole = [{
+    routesByRole = [
+  {
       title: 'Categories',
       to: { name: 'categories' },
       icon: { icon: 'tabler-plane' },
-    }]
+    },
+    {
+      title: 'Export CSV',
+      to: { name: 'export' },
+      icon: { icon: 'tabler-file-export' },
+    }
+  ]
   
   if (isNotAgent) 
     routesByRole = [
       userRoute,
-      ...routesByRole
+      ...routesByRole,
     ]
 
   return [
     ...defaultRoutes, 
-    ...routesByRole 
+    ...routesByRole, 
   ]
 }
 
 export {
   permissionedRoutes
-};
+}
 

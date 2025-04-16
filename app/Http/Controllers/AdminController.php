@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CategoryType;
+use App\Models\CampaignDetail;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Log;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 use App\Models\Category;
 
@@ -184,5 +189,161 @@ class AdminController extends Controller
             "categories" => $categories,
             "sub_categories" => $sub_categories,
         ];
+    }
+
+    /* public function exportCsv(Request $request)
+    {
+        $chunk = 500; // Number of records per chunk
+        $output = fopen('php://stdout', 'wb+'); // Open a stream to StdOut
+
+        // Write the CSV headers
+        fputcsv($output, ['ID', 'Campaign', 'Leader', 'Agent', 'Status', 'Sub Status', 'Applicant Name', 'Applicant Mobile', 'Applicant Other Phone']);
+
+        $leaderId = request('leader');
+        $agentId = request('agent'); // can be "all"
+        $status = request('status');
+        $subStatus = request('sub_status'); // can be "all"
+
+        DB::table('campaign_details')
+            ->leftJoin('users as leaders', 'campaign_details.assigned_leader', '=', 'leaders.id')
+            ->leftJoin('users as agents', 'campaign_details.assigned_user', '=', 'agents.id')
+            ->leftJoin('categories as ps', 'campaign_details.progressStatus', '=', 'ps.id')
+            ->leftJoin('categories as pss', 'campaign_details.progressSubStatus', '=', 'pss.id')
+            ->where('campaign_details.assigned_leader', $leaderId)
+            ->where('campaign_details.progressStatus', $status)
+            ->when($agentId !== 'all', fn($q) => $q->where('campaign_details.assigned_user', $agentId))
+            ->when($subStatus !== 'all', fn($q) => $q->where('campaign_details.progressSubStatus', $subStatus))
+            ->orderBy('agents.username')
+            ->select([
+                'campaign_details.id',
+                'campaign_details.campaign_id',
+                'leaders.username as leader_name',
+                'agents.username as agent_name',
+                'ps.name as progress_status_name',
+                'pss.name as progress_sub_status_name',
+                'campaign_details.applicantname',
+                'campaign_details.applicantmobile',
+                'campaign_details.applicantotherphone',
+            ])
+            ->chunk($chunk, function ($rows) use ($output) {
+                foreach ($rows as $row) {
+                    fputcsv($output, [
+                        $row->id,
+                        $row->campaign_id,
+                        $row->leader_name,
+                        $row->agent_name,
+                        $row->progressStatus,
+                        $row->progressSubStatus,
+                        $row->applicantname,
+                        $row->applicantmobile,
+                        $row->applicantotherphone,
+                    ]);
+                }
+            });
+    } */
+
+    public function exportCsv(Request $request)
+    {
+        $chunk = 500;
+
+        $leaderId = $request->input('leader');
+        $agentId = $request->input('agent');
+        $status = $request->input('status');
+        $subStatus = $request->input('sub-status');
+
+        Log::info("Exporting CSV with parameters: ", [
+            'leaderId' => $leaderId,
+            'agentId' => $agentId,
+            'status' => $status,
+            'subStatus' => $subStatus,
+        ]);
+        $query = DB::table('campaign_details')
+            ->leftJoin('users as leaders', 'campaign_details.assigned_leader', '=', 'leaders.id')
+            ->leftJoin('users as agents', 'campaign_details.assigned_user', '=', 'agents.id')
+            ->where('campaign_details.assigned_leader', $leaderId)
+            ->where('campaign_details.progressStatus', $status)
+            ->when($agentId !== 'all', fn($q) => $q->where('campaign_details.assigned_user', $agentId))
+            ->when($subStatus !== 'all', fn($q) => $q->where('campaign_details.progressSubStatus', $subStatus))
+            ->orderBy('agents.username')
+            ->select([
+                'campaign_details.id',
+                'campaign_details.campaign_id',
+                'leaders.username as leader_name',
+                'agents.username as agent_name',
+                'campaign_details.progressStatus',
+                'campaign_details.progressSubStatus',
+                'campaign_details.applicantname',
+                'campaign_details.applicantmobile',
+                'campaign_details.applicantotherphone',
+            ]);
+        // Get raw SQL with placeholders
+        $sqlWithBindings = $query->toSql();
+        $bindings = $query->getBindings();
+
+        // Manually substitute bindings into the SQL string (safe for logs, not for execution)
+        $finalSql = vsprintf(str_replace('?', "'%s'", $sqlWithBindings), $bindings);
+
+        // Log it
+        Log::info('Compiled SQL:', ['query' => $finalSql]);
+        $response = new StreamedResponse(function () use ($chunk, $leaderId, $agentId, $status, $subStatus) {
+            $output = fopen('php://output', 'w');
+
+            // Write CSV headers
+            fputcsv($output, [
+                'ID',
+                'Campaign',
+                'Leader',
+                'Agent',
+                'Status',
+                'Sub Status',
+                'Applicant Name',
+                'Applicant Mobile',
+                'Applicant Other Phone',
+            ]);
+
+            DB::table('campaign_details')
+                ->leftJoin('users as leaders', 'campaign_details.assigned_leader', '=', 'leaders.id')
+                ->leftJoin('users as agents', 'campaign_details.assigned_user', '=', 'agents.id')
+                ->where('campaign_details.assigned_leader', $leaderId)
+                ->where('campaign_details.progressStatus', $status)
+                ->when($agentId !== 'all', fn($q) => $q->where('campaign_details.assigned_user', $agentId))
+                ->when($subStatus !== 'all', fn($q) => $q->where('campaign_details.progressSubStatus', $subStatus))
+                ->orderBy('agents.username')
+                ->select([
+                    'campaign_details.id',
+                    'campaign_details.campaign_id',
+                    'leaders.username as leader_name',
+                    'agents.username as agent_name',
+                    'campaign_details.progressStatus',
+                    'campaign_details.progressSubStatus',
+                    'campaign_details.applicantname',
+                    'campaign_details.applicantmobile',
+                    'campaign_details.applicantotherphone',
+                ])
+                ->chunk($chunk, function ($rows) use ($output) {
+                    foreach ($rows as $row) {
+                        fputcsv($output, [
+                            $row->id,
+                            $row->campaign_id,
+                            $row->leader_name,
+                            $row->agent_name,
+                            $row->progress_status_name,
+                            $row->progress_sub_status_name,
+                            $row->applicantname,
+                            $row->applicantmobile,
+                            $row->applicantotherphone,
+                        ]);
+                    }
+                });
+
+            fclose($output);
+        });
+
+        $filename = 'campaign_export_' . now()->format('Ymd_His') . '.csv';
+
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', "attachment; filename=\"$filename\"");
+
+        return $response;
     }
 }

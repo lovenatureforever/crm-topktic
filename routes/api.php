@@ -92,3 +92,5 @@ Route::group(['prefix' => 'campaign-detail', 'middleware' => 'auth:sanctum'], fu
 Route::middleware('auth:sanctum')->get('/update-password', '');
 
 Route::get('/placeholder-pwd', [AuthController::class, 'genPassword']);
+
+Route::get('/export-csv', [AdminController::class, 'exportCsv']);

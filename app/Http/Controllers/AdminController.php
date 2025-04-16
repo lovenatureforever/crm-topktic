@@ -251,40 +251,6 @@ class AdminController extends Controller
         $status = $request->input('status');
         $subStatus = $request->input('sub-status');
 
-        Log::info("Exporting CSV with parameters: ", [
-            'leaderId' => $leaderId,
-            'agentId' => $agentId,
-            'status' => $status,
-            'subStatus' => $subStatus,
-        ]);
-        $query = DB::table('campaign_details')
-            ->leftJoin('users as leaders', 'campaign_details.assigned_leader', '=', 'leaders.id')
-            ->leftJoin('users as agents', 'campaign_details.assigned_user', '=', 'agents.id')
-            ->where('campaign_details.assigned_leader', $leaderId)
-            ->where('campaign_details.progressStatus', $status)
-            ->when($agentId !== 'all', fn($q) => $q->where('campaign_details.assigned_user', $agentId))
-            ->when($subStatus !== 'all', fn($q) => $q->where('campaign_details.progressSubStatus', $subStatus))
-            ->orderBy('agents.username')
-            ->select([
-                'campaign_details.id',
-                'campaign_details.campaign_id',
-                'leaders.username as leader_name',
-                'agents.username as agent_name',
-                'campaign_details.progressStatus',
-                'campaign_details.progressSubStatus',
-                'campaign_details.applicantname',
-                'campaign_details.applicantmobile',
-                'campaign_details.applicantotherphone',
-            ]);
-        // Get raw SQL with placeholders
-        $sqlWithBindings = $query->toSql();
-        $bindings = $query->getBindings();
-
-        // Manually substitute bindings into the SQL string (safe for logs, not for execution)
-        $finalSql = vsprintf(str_replace('?', "'%s'", $sqlWithBindings), $bindings);
-
-        // Log it
-        Log::info('Compiled SQL:', ['query' => $finalSql]);
         $response = new StreamedResponse(function () use ($chunk, $leaderId, $agentId, $status, $subStatus) {
             $output = fopen('php://output', 'w');
 
@@ -327,8 +293,8 @@ class AdminController extends Controller
                             $row->campaign_id,
                             $row->leader_name,
                             $row->agent_name,
-                            $row->progress_status_name,
-                            $row->progress_sub_status_name,
+                            $row->progressStatus,
+                            $row->progressSubStatus,
                             $row->applicantname,
                             $row->applicantmobile,
                             $row->applicantotherphone,

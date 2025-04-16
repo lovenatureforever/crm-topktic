@@ -1,0 +1,83 @@
+    /////////////////// category ////////////////////////
+    const FOLLOWUP = 'FOLLOWUP';
+    const FRESH = 'Fresh';
+    const INACTIVE = 'INACTIVE';
+    const NEW_NEW = 'NEW NEW';
+    const NEW_NEW_WITH_EXISTING_POSTPAID = 'NEW NEW WITH EXISTING POSTPAID';
+    const NEW_NEW_WITH_NEW_POSTPAID = 'NEW NEW WITH NEW POSTPAID';
+    const PENDING = 'PENDING';
+    const REJECT = 'REJECT';
+    const SUCCESS = 'SUCCESS(Business Plan)';
+    const WINBACK = 'WINBACK';
+
+    /////////////////// sub category ////////////////////////
+    const DECLINE_TO_SUBMIT_IC = 'Decline to Submit IC';
+    const HIDDEN_CHANGES = 'Hidden Charges (Rumors)';
+    const INTERSTED_ON_TIME_FIBRE = 'Interested on Time Fibre';
+    const INTERESTED_APPLY = 'Interested to apply other service providers';
+    const NO_ANSEWR_HANGUP = 'No answer / Hang-up';
+    const NOT_BELIEVE = 'Not believe in Maxis Fibre Branding';
+    const SLOW_INTERNET = 'Slow Internet (Rumors)';
+    const SUSPECT_CON_CALL = 'Suspect Con Call';
+    
+    const FRESH = 'Fresh';
+
+    const INVALID_NUMBER = 'Invalid Number';
+    const NO_ANSWER = 'No Answer';
+    const WRONG_NUMBER = 'Wrong Number';
+
+    const NEW_100MB  = "MAXIS HOME 100MBPS (RM99/MONTH) (REBATE RM10 X 24 MONTHS)";
+    const NEW_300MB = "MAXIS HOME FIBRE SUPER 300MBPS (RM139/MONTH) (REBATE RM10 X 24 MONTHS) FREE 3 MONTHS";
+    const NEW_500MB = "MAXIS HOME FIBRE SUPER 500MBPS (RM159/MONTH) (REBATE RM10 X 24 MONTHS) FREE 3 MONTHS";
+    const NEW_1GB = "MAXIS HOME FIBRE SUPER 1GBPS (RM249/MONTH) FREE 3 MONTHS";
+    const NEW_2GB = "MAXIS HOME FIBRE SUPER 2GBPS (RM319/MONTH) FREE 3 MONTHS";
+
+    const POSTPAID_300MB = "MAXIS HOME FIBRE PRIME SAVER SUPERCHARGE 300MBPS (FREE SPEED UPGRADE X 24 MONTHS) (RM99/MONTH) FREE 3 MONTHS (EXISTING POSTPAID RM60)";
+    const POSTPAID_500MB = "MAXIS HOME FIBRE PRIME SAVER SUPERCHARGE 500MBPS (FREE SPEED UPGRADE X 24 MONTHS) (RM139/MONTH) FREE 3 MONTHS (EXISTING POSTPAID RM60)";
+    const POSTPAID_1GB = "MAXIS HOME FIBRE PRIME SAVER SUPERCHARGE 1GBPS (FREE SPEED UPGRADE X 24 MONTHS) (RM159/MONTH) FREE 3 MONTHS (EXISTING POSTPAID RM60)";
+    const POSTPAID_2GB = "MAXIS HOME FIBRE PRIME SAVER SUPERCHARGE 2GBPS (FREE SPEED UPGRADE X 24 MONTHS) (RM319/MONTH) FREE 3 MONTHS (EXISTING POSTPAID RM60)";
+    
+    const NEW_POSTPAID_300MB = "MAXIS HOME FIBRE PRIME SAVER SUPERCHARGE 300MBPS (FREE SPEED UPGRADE X 24 MONTHS) (RM99/MONTH) FREE 6 MONTHS (EXISTING POSTPAID RM60)";
+    const NEW_POSTPAID_500MB = "MAXIS HOME FIBRE PRIME SAVER SUPERCHARGE 500MBPS (FREE SPEED UPGRADE X 24 MONTHS) (RM139/MONTH) FREE 6 MONTHS (EXISTING POSTPAID RM60)";
+    const NEW_POSTPAID_1GB = "MAXIS HOME FIBRE PRIME SAVER SUPERCHARGE 1GBPS (FREE SPEED UPGRADE X 24 MONTHS) (RM159/MONTH) FREE 6 MONTHS (EXISTING POSTPAID RM60)";
+    const NEW_POSTPAID_2GB = "MAXIS HOME FIBRE PRIME SAVER SUPERCHARGE 2GBPS (FREE SPEED UPGRADE X 24 MONTHS) (RM319/MONTH) FREE 6 MONTHS (EXISTING POSTPAID RM60)";
+
+    const CALLBACK = "Call Back";
+    const OUTCONTRACT = "OUT-CONTRACT";
+    const PENDING_DOCUMENTS = "Pending supporting documents";
+    const UNDER_CONSIDERATION = "Under consideration";
+
+    const = "Accepted Count Offer";
+    const = "Already Astro IPTV";
+    const = "Already CelecomDigi";
+    const = "Already Maxis";
+    const = "Already Time Fibre";
+    const = "Already UNIFIED";
+    const = "Cannot accept internet downtime";
+    const = "Family Disagree";
+    const = "Hang Up";
+    const = "In-Contract";
+    const = "No Clear Reason Given";
+    const = "None-Serviceable Area";
+    const = "Others(Please provide specific reason)";
+    const = "Refuse to pay early termination fee - remaining month charges";
+    const = "Refuse to pay early termination fee - RM 500/remaining month charges";
+    const = "Refuse to Pay Written-off Amount";
+    const = "Refuse Walk-in for Termination";
+    const = "Reallocation";
+    const = "Remain unifi TV";
+    const = "Remain VOIP Number";
+    const = "Terminated Account";
+
+
+    const = "Maxis Business Fibre 30Mbps RM99";
+    const = "Maxis Business Fibre 100Mbps RM139";
+    const = "Maxis Business Fibre 300Mbps RM199";
+    const = "Maxis Business Fibre 500Mbps RM269";
+    const = "Maxis Business Fibre 800Mbps RM349";
+
+    const = "MAXIS HOME 100MBPS (RM99/MONTH) (SWITCH OVER FREE 3 MONTHS) (REBATE RM10 X 24 MONTHS)";    
+    const = "MAXIS HOME 300MBPS (RM139/MONTH) (SWITCH OVER FREE 6 MONTHS) (REBATE RM10 X 24 MONTHS)";
+    const = "MAXIS HOME 500MBPS (RM159/MONTH) (SWITCH OVER FREE 6 MONTHS) (REBATE RM10 X 24 MONTHS)";
+    const = "MAXIS HOME 1GBPS (RM249/MONTH)";
+    const = "MAXIS HOME 2GBPS (RM319/MONTH)";

@@ -265,6 +265,15 @@ class AdminController extends Controller
                 'Applicant Name',
                 'Applicant Mobile',
                 'Applicant Other Phone',
+                'Applicantidentity',
+                'Applicantaddress1',
+                'Applicantaddress2',
+                'Applicantaddress3',
+                'Applicantpostcode',
+                'Applicantcity',
+                'Applicantstate',
+                'Billingaddress1',
+                'Productname',
             ]);
 
             DB::table('campaign_details')
@@ -285,6 +294,15 @@ class AdminController extends Controller
                     'campaign_details.applicantname',
                     'campaign_details.applicantmobile',
                     'campaign_details.applicantotherphone',
+                    'campaign_details.applicantidentity',
+                    'campaign_details.applicantaddress1',
+                    'campaign_details.applicantaddress2',
+                    'campaign_details.applicantaddress3',
+                    'campaign_details.applicantpostcode',
+                    'campaign_details.applicantcity',
+                    'campaign_details.applicantstate',
+                    'campaign_details.billingaddress1',
+                    'campaign_details.productname',
                 ])
                 ->chunk($chunk, function ($rows) use ($output) {
                     foreach ($rows as $row) {
@@ -298,6 +316,15 @@ class AdminController extends Controller
                             $row->applicantname,
                             $row->applicantmobile,
                             $row->applicantotherphone,
+                            $row->applicantidentity,
+                            $row->applicantaddress1,
+                            $row->applicantaddress2,
+                            $row->applicantaddress3,
+                            $row->applicantpostcode,
+                            $row->applicantcity,
+                            $row->applicantstate,
+                            $row->billingaddress1,
+                            $row->productname,
                         ]);
                     }
                 });
